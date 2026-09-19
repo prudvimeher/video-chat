@@ -25,6 +25,10 @@ logger = logging.getLogger(__name__)
 _TURN_USERNAME: str | None = os.getenv("TURN_USERNAME")
 _TURN_CREDENTIAL: str | None = os.getenv("TURN_CREDENTIAL")
 _FRONTEND_ORIGIN: str | None = os.getenv("FRONTEND_ORIGIN", "").rstrip("/") or None
+_LOCAL_DEV_ORIGIN = "http://localhost:5173"
+_ALLOWED_ORIGINS = [_LOCAL_DEV_ORIGIN]
+if _FRONTEND_ORIGIN and _FRONTEND_ORIGIN not in _ALLOWED_ORIGINS:
+    _ALLOWED_ORIGINS.append(_FRONTEND_ORIGIN)
 
 # ---------------------------------------------------------------------------
 # Room Code Store & In-Memory Management
@@ -131,10 +135,12 @@ async def lifespan(app: FastAPI):
 app = FastAPI(title="WebSocket Chat Rooms", lifespan=lifespan)
 
 # Only the deployed frontend may make cross-origin API and WebSocket requests.
-# Set FRONTEND_ORIGIN to the exact Vercel URL (without a trailing slash).
+# Local Vite development is always allowed. Set FRONTEND_ORIGIN to the exact
+# Vercel URL (without a trailing slash) for production.
+logger.info("CORS allowed origins: %s", _ALLOWED_ORIGINS)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[_FRONTEND_ORIGIN] if _FRONTEND_ORIGIN else [],
+    allow_origins=_ALLOWED_ORIGINS,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
