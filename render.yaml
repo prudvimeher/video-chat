@@ -1,0 +1,18 @@
+services:
+  - type: web
+    name: video-chat-backend
+    runtime: docker
+    plan: free
+    dockerfilePath: ./Dockerfile
+    envVars:
+      - key: PORT
+        value: 10000
+      # Enter these in the Render dashboard; sync:false prevents committed values.
+      - key: TURN_USERNAME
+        sync: false
+      - key: TURN_CREDENTIAL
+        sync: false
+      - key: FRONTEND_ORIGIN
+        sync: false
+    healthCheckPath: /health
+    autoDeploy: true

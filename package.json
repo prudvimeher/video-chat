@@ -1,0 +1,8 @@
+{
+  "name": "video-chat",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test:webrtc": "node scripts/test-webrtc.js"
+  }
+}
